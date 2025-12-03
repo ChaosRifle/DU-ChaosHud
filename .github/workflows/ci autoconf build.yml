@@ -36,7 +36,7 @@ jobs:
           git config --global user.email '[N/A]'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git checkout "${GITHUB_REF:11}"
-          git commit -am "Automated Build"
           git add *.txt
           git add *.json
+          git commit -am "Automated Build"
           git push
