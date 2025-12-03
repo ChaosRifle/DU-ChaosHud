@@ -14,18 +14,28 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - name: create compiled autoconf of ChaosHud
+      - name: gather local info
           #SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         run: |
           pwd
           ls -l
+          
+      - name: datestamp
+        run: |
           date +%s > builddate.txt
+          
+      - name: build autoconf
+        run: |
           echo 'sh python3 Assembler.py ChaosHudFighter'
           echo 'sh python3 Assembler.py ChaosHudGunner'
           echo 'sh python3 Assembler.py ChaosHudPilot'
+
+      - name: git push
+        run: |
           git config --global user.name 'CI - ChaosHud'
           git config --global user.email '[N/A]'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git checkout "${GITHUB_REF:11}"
           git commit -am "Automated Build"
+          git add -A
           git push
