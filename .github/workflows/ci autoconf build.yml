@@ -1,0 +1,31 @@
+name: CI ChaosHud build script
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**/**.lua'
+      - 'src/**/confTemplate.yaml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+#    container: ubuntu    # "ubuntu" is a more generic container
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: create compiled autoconf of ChaosHud
+          #SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        run: |
+          pwd
+          ls -l
+          date +%s > builddate.txt
+          echo 'sh python3 Assembler.py ChaosHudFighter'
+          echo 'sh python3 Assembler.py ChaosHudGunner'
+          echo 'sh python3 Assembler.py ChaosHudPilot'
+          git config --global user.name 'CI - ChaosHud'
+          git config --global user.email '[N/A]'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout "${GITHUB_REF:11}"
+          git commit -am "Automated Build"
+          git push
