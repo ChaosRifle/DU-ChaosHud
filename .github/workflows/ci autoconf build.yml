@@ -26,7 +26,7 @@ jobs:
           
       - name: build autoconf
         run: |
-          echo 'sh python3 Assembler.py ChaosHudFighter'
+          python3 Assembler.py ChaosHudFighter
           echo 'sh python3 Assembler.py ChaosHudGunner'
           echo 'sh python3 Assembler.py ChaosHudPilot'
 

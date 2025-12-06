@@ -1,0 +1,2 @@
+--Nav.axisCommandManager:updateCommandFromActionLoop(axisCommandId.longitudinal, -1.0)
+--longitudinalInputKb = longitudinalInputKb - 1
