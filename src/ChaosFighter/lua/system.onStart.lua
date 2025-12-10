@@ -1,5 +1,5 @@
 colour = '#64a5b9'
-local temp = 'hahah'
+
 periscope = [[
 <style>
   img {
