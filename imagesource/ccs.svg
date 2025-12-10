@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   sodipodi:docname="ccs.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.0467522"
+     inkscape:cx="396.4644"
+     inkscape:cy="561.25984"
+     inkscape:window-width="1025"
+     inkscape:window-height="1080"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="CCS -"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="matrix(0.26458333,0,0,0.26458333,-129.22199,-211.65617)">
+    <text
+       xml:space="preserve"
+       style="font-size:12px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#64a5b9;fill-opacity:1"
+       x="1000.4221"
+       y="1255.3564"
+       id="text8"
+       inkscape:label="text input percent"><tspan
+         sodipodi:role="line"
+         id="tspan8"
+         x="1000.4221"
+         y="1255.3564">80%</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12.298px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;white-space:pre;inline-size:90.1896;display:inline;fill:#64a5b9;fill-opacity:1"
+       x="100.18579"
+       y="75.211105"
+       id="text10"
+       transform="matrix(0,-0.81313731,0.81313731,0,937.66299,1323.6894)"
+       inkscape:label="text input raw"><tspan
+         x="100.18579"
+         y="75.211105"
+         id="tspan2">23.1M / 43.7M</tspan></text>
+    <path
+       style="font-variation-settings:normal;opacity:1;fill:none;fill-opacity:1;stroke:#64a5b9;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;stop-opacity:1"
+       d="m 1010.7098,1243.3259 v -217"
+       id="path2"
+       sodipodi:nodetypes="cc"
+       inkscape:label="scaling bar" />
+    <path
+       style="font-variation-settings:normal;opacity:1;fill:none;fill-opacity:1;stroke:#64a5b9;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;stop-opacity:1"
+       d="m 1006.7098,1242.3259 h -3 v -217 h 10"
+       id="path1"
+       sodipodi:nodetypes="cccc"
+       inkscape:label="static datum" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#64a5b9;fill-opacity:1;stroke:none;stroke-width:1;stroke-dasharray:none;stroke-dashoffset:5.5;stroke-opacity:1"
+       x="997.97217"
+       y="1019.8666"
+       id="text25-1"
+       inkscape:label="static label"><tspan
+         sodipodi:role="line"
+         id="tspan25-8"
+         x="997.97217"
+         y="1019.8666">CCS</tspan></text>
+  </g>
+</svg>
