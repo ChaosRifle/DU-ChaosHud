@@ -1,4 +1,47 @@
-colour = '#64a5b9'
+ccat=table.concat
+
+colour = '#64a5b9' --export
+colourBoresight = '#808080' --export
+colourTvi = '#56fca6' --export
+colourAtvi = '#64a5b9' --export
+colourIdentifyRange = '#cfff1e' --export
+colourWeaponRange = '#00ab00' --export
+colourBogey = '#ffff00' --export
+colourBandit = '#ff0000' --export
+colourFriendly = '#00ff00' --export
+
+
+local weaponRange = 1401
+local identRange = 1241
+
+function svgTxt(x,y,font,size,colour,anchor,text,rotate)
+  if rotate then rotate ='" transform="rotate(-90)'else rotate =''end
+  if anchor ==2 then anchor ='middle'elseif anchor ==3 then anchor ='end'else anchor = 'start'end
+  return table.concat({'<text style="fill: ',colour,'; font-family: ',font,'; font-size: ',size,'; text-anchor:',anchor,';" x="',x,'" y="',y,rotate,'" >',text,'</text>'})
+end
+
+function svgPth(colour,path,width,opacity)
+  if opacity == nil then opacity = 1 end
+  return ccat({'<path d="m ', path,'" style="opacity:',opacity,';fill:none;stroke:',colour,';stroke-width:',width,';"/>'})
+end
+function svgPthFill(colour,path,opacity)
+  if opacity == nil then opacity = 1 end
+  return ccat({'<path d="m ',path,'" style="fill:',colour,';fill-opacity:',opacity,';stroke-opacity:0"/>'})
+end
+
+function svg(content, vb3, vb4, vb1, vb2)
+  --viewbox = {230,80,2560,1440}
+  --contents = svgTxt()
+  if vb1 == nil then vb1 = 0 end
+  if vb2 == nil then vb2 = 0 end
+  local data = {'<svg style="position:absolute;" viewbox="', ccat({vb1,vb2,vb3,vb4},' '), '" preserveAspectRatio="none">', '</svg>' }
+  for i=1, #content, 1 do
+    table.insert(data, 3+i, content[i])
+  end
+  return ccat(data)
+end
+
+
 
 periscope = [[
 <style>
@@ -28,22 +71,286 @@ periscopeStaticBorder =
     </svg>
 ]]
 
-staticThrottle = [[
+------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------- gunnery seat ----------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------
+staticTarget = svg({
+        svgPth(colour,'1019.5,112 h 334',1),
+        svgPth(colour,'1019.5,123 h 334',1),
+
+        svgTxt(1300,100,'Arial',8,colour,1,'ANGULAR VELOCITY'),
+        svgTxt(1300,100,'Arial',12,colour,1,'HIT PROBABILITY'),
+        svgTxt(1400,150,'Arial',12,colour,1,'RANGE'),
+        svgTxt(1300,150,'Arial',12,colour,1,'MAX SPEED'),
+    }, 2560, 1440)
+dynamicTarget = svg({
+        svgPthFill(colour,'1019.5,179 v8 h ' .. 334 * .45 ..' v -8 z'),
+
+        svgTxt(1300,100,'Arial',8,colour,1,'TARGET LOCKED / NO TARGET'),
+        svgTxt(1300,100,'Arial',8,colour,1,'UID'),
+        svgTxt(1300,100,'Arial',8,colour,2,'XS'),
+        svgTxt(1300,100,'Arial',8,colour,1,'TARGET SHIP NAME GOES HERE'),
+
+        svgTxt(1300,100,'Arial',8,colour,1,'0.05° per sec'),
+        svgTxt(1300,100,'Arial',8,colour,1,'119 M'),
+        svgTxt(1300,100,'Arial',8,colour,1,'51468 KPH'),
+        svgTxt(1300,100,'Arial',8,colour,1,'100%'),
+
+
+        svgPthFill('#188347','1018.6625,149.95971 25.7273,-0.0806 97.3198,17.13078 -122.8727,-0.0118 z',.5),
+        svgPth('#34d484','1044.4524,149.05643 v 17.97641',1),
+        svgPth(colour,'1142.3069,149.04321 v 18.51302 H 1018.216 v -18.24472',1),
+        svgPthFill(colour,1015+124*.75 ..',167.5 5,-13.5 5,13.5 z'),
+    }, 2560, 1440)
+
+local weaponArray = {'','','','','',''}
+staticWeapon = svg({
+        svgTxt(1465,142,'Arial',8,colour,2,'WEAPON STATUS'),
+        svgPth(colour,'1415,145 h 100',1),
+
+        svgPth(colour,'1415,152.5 h '..100 * 0.75,8),
+        svgPth(colour,'1415,160 h 100',1),
+
+
+
+
+        svgTxt(1800,150,'Arial',8,colour,1,'SHOTS FIRED'),
+        svgTxt(1800,160,'Arial',8,colour,1,'SHOTS HIT'),
+        svgTxt(1800,170,'Arial',8,colour,1,'ACCURACCY'),
+        svgTxt(1800,180,'Arial',8,colour,1,'PEAK DPS'),
+        svgTxt(1800,190,'Arial',8,colour,1,'DAMAGE TOTAL')
+    }, 2560, 1440)
+dynamicWeapon = svg({
+        svgTxt(1900,150,'Arial',8,colour,1,'1380'),
+        svgTxt(1900,160,'Arial',8,colour,1,'1275'),
+        svgTxt(1900,170,'Arial',8,colour,1,'95%'),
+        svgTxt(1900,180,'Arial',8,colour,1,'102 K'),
+        svgTxt(1900,190,'Arial',8,colour,1,'440295 K')
+    }, 2560, 1440)
+
+staticDpsMeter = svg({
+        svgPth(colour,'1499.5,299.5 h -100 v -50 l 2,-0.0206',1),
+    }, 2560, 1440)
+dynamicDpsMeter = svg({
+  svgPth(colour,'1400.7484,298.79558 7.577,-11.85958 10.2124,-7.24752 7.9064,8.23582 10.5418,-12.84788 8.2359,-7.24753 8.2358,-10.54185 9.5535,-0.98829 9.2242,-0.32944 9.883,0.32944 11.2007,-10e-6 8.8946,-2.63545',1),
+  svgTxt(1502,299,'Arial',8,colour,1,'102 K DPS'),
+}, 2560, 1440)
+
+------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------- gunner and pilot seat -----------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------
+staticRangingTableVertical = [[
+  <svg style="position:absolute;" viewbox="250 675 2560 1440" preserveAspectRatio="none">
+    <path d="m 1040, ]] ..identRange..[[ h -14"
+    style='opacity:1;fill:none;stroke:]]..colourIdentifyRange..[[;stroke-width:2;'
+    />
+    <text style="fill: ]]..colourIdentifyRange..[[; font-family: Arial; font-size: 12; text-anchor:start;" x="1042" y="]] .. identRange + 4 .. [[" >IDENT</text>
+    <path d="m 1040,]]..weaponRange..[[ h -14"
+    style='opacity:1;fill:none;stroke:]]..colourWeaponRange..[[;stroke-width:2;'
+    />
+    <text style="fill: ]]..colourWeaponRange..[[; font-family: sans-serif; font-size: 12; text-anchor:start;" x="1044" y="]]..weaponRange + 4 ..[[" >MAX</text>
+    <path d="M 1032,1550 V ]]..weaponRange..[["
+    style='opacity:0.3;fill:none;stroke:]]..colourWeaponRange..[[;stroke-width:12;'
+    />
+  <text style="fill: ]]..colour..[[; font-family: sans-serif; font-size: 12; text-anchor:start;" x="1042.5" y="1555" >0.0 SU</text>
+  <circle cx="1012" cy="1550" r="8"
+    style='opacity:1;fill:none;stroke:]]..colourFriendly..[[;stroke-width:1;'
+  />
+  <text style="fill: ]]..colour..[[; font-family: sans-serif; font-size: 12; text-anchor:end;" x="999" y="1554" >SELF</text>
+
+  <text style="fill: ]]..colour..[[; font-family: sans-serif; font-size: 12; text-anchor:start;" x="1046" y="805" >5.0 SU</text>
+
+    <path d="m 1040,800 h -15 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 9.5 -9.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 15 -15 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 9.5 -9.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 15"
+    style='opacity:1;fill:none;stroke:]]..colour..[[;stroke-width:1;'
+    />
+  </svg>
+]]
+dynamicRangingTableVertical = [[
+  <svg style="position:absolute;" viewbox="250 675 2560 1440" preserveAspectRatio="none">
+    <rect width="16" height="16" x="837.83148" y="1273.0002"
+    style='opacity:1;fill:none;stroke:]]..colourBogey..[[;stroke-width:1;'
+    />
+    <circle cx="930" cy="1280" r="8"
+    style='opacity:1;fill:none;stroke:]]..colourFriendly..[[;stroke-width:1;'
+    />
+  <path d="m 945,1272 8,8 -8,8 -8,-8 8,-8"
+    style='opacity:1;fill:none;stroke:]]..colourBandit..[[;stroke-width:1;'
+    />
+
+<path d="m 930,1273.5 1.45775,4.5201 4.7493,-0.01 -3.84837,2.7832 1.47749,4.5136 -3.83617,-2.8 -3.83616,2.8 1.47749,-4.5136 -3.84838,-2.7832 4.74931,0.01 z"
+       style="fill:]]..colourBogey..[[;fill-opacity:1;stroke:none;stroke-width:1;stroke-opacity:1"
+       />
+  </svg>
+]]
+
+
+staticRangingTableHorizontal = [[
+  <svg style="position:absolute;" viewbox="0 200 2560 1440" preserveAspectRatio="none">
+    <path d="m 1239.2006,1255 4e-4,14"
+    style='opacity:1;fill:none;stroke:]]..colourIdentifyRange..[[;stroke-width:2;'
+    />
+    <text style="fill: ]]..colourIdentifyRange..[[; font-family: Arial; font-size: 12; text-anchor:start;" x="-1252.2352" y="1243.6326" transform="rotate(-90)" >IDENT</text>
+    <path d="m 890.586,1255 v 14"
+    style='opacity:1;fill:none;stroke:]]..colourWeaponRange..[[;stroke-width:2;'
+    />
+    <text style="fill: ]]..colourWeaponRange..[[; font-family: sans-serif; font-size: 12; text-anchor:start;" x="-1251.0969" y="894.69" transform="rotate(-90)" >MAX</text>
+    <path d="M 750,1263 H 890.61179"
+    style='opacity:0.3;fill:none;stroke:]]..colourWeaponRange..[[;stroke-width:12;'
+    />
+  <text style="fill: ]]..colour..[[; font-family: sans-serif; font-size: 12; text-anchor:start;" x="-1251.7878" y="1504.1157" transform="rotate(-90)" >5.0 SU</text>
+  <text style="fill: ]]..colour..[[; font-family: sans-serif; font-size: 12; text-anchor:start;" x="-1248.2944" y="754.16522" transform="rotate(-90)" >0.0 SU</text>
+
+    <path d="m 750,1255 v 15 h 37.5 v -4.5 4.5 H 825 v -4.5 4.5 h 37.5 v -4.5 4.5 H 900 v -4.5 4.5 h 37.5 v -9.5 9.5 H 975 v -4.5 4.5 h 37 v -4.5 4.5 h 38 v -4.5 4.5 h 37.5 v -4.5 4.5 h 37.5 v -15 15 h 37.5 v -4.5 4.5 h 37.5 v -4.5 4.5 h 37.5 v -4.5 4.5 h 37.5 v -4.5 4.5 h 37.5 v -9.5 9.5 h 37.5 v -4.5 4.5 h 37.5 v -4.5 4.5 h 37.5 v -4.5 4.5 h 37.5 v -4.5 4.5 h 37.5 v -15"
+    style='opacity:1;fill:none;stroke:]]..colour..[[;stroke-width:1;'
+    />
+  </svg>
+]]
+dynamicRangingTableHorizontal = [[
+  <svg style="position:absolute;" viewbox="0 200 2560 1440" preserveAspectRatio="none">
+
+  </svg>
+]]
+
+warningFriendly = svg({
+        svgTxt(1280,330,'Arial',24,colour,2,'FRIENDLY TARGET'),
+    }, 2560, 1440)
+------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------ pilot seat ------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------
+dynamicTvi =  [[
   <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <path d="m 1161,481 v 21"
+    style='opacity:1;fill:none;stroke:]]..colourTvi..[[;stroke-width:2;'
+    />
+    <path d="m 1170,511 h 21"
+    style='opacity:1;fill:none;stroke:]]..colourTvi..[[;stroke-width:2;'
+    />
+    <path d="m 1161,520 v 21"
+    style='opacity:0;fill:none;stroke:]]..colourTvi..[[;stroke-width:2;'
+    />
+    <path d="m 1131,511 h 21"
+    style='opacity:1;fill:none;stroke:]]..colourTvi..[[;stroke-width:2;'
+    />
+
+    <circle cx="1161" cy="511" r="9"
+    style='opacity:1;fill:none;stroke:]]..colourTvi..[[;stroke-width:2;'
+    />
+  </svg>
+]]
+dynamicAtvi =  [[
+  <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <path d="m 1325,525 50,50"
+    style='opacity:1;fill:none;stroke:]]..colourAtvi..[[;stroke-width:6;'
+    />
+    <path d="m 1375,525 -50,50"
+    style='opacity:1;fill:none;stroke:]]..colourAtvi..[[;stroke-width:6;'
+    />
+  </svg>
+]]
+dynamicBoresight =   [[
+  <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <path d="M 1250,537.5 V 525"
+    style='opacity:0.5;fill:none;stroke:]]..colourBoresight..[[;stroke-width:1;'
+    />
+    <path d="M 1262.5,550 H 1275"
+    style='opacity:0.5;fill:none;stroke:]]..colourBoresight..[[;stroke-width:1;'
+    />
+    <path d="M 1250,575 V 562.5"
+    style='opacity:0.5;fill:none;stroke:]]..colourBoresight..[[;stroke-width:1;'
+    />
+    <path d="M 1237.5,550 H 1225"
+    style='opacity:0.5;fill:none;stroke:]]..colourBoresight..[[;stroke-width:1;'
+    />
+  </svg>
+]]
+
+staticBrakesAndDeltaV = [[
+  <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:end;" x="1480" y="650" >BRK TME</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 8; text-anchor:start;" x="1485" y="670" >MIN</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:end;" x="1480" y="690" >BRK DST</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 8; text-anchor:start;" x="1485" y="710" >M</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:end;" x="1480" y="730" >BRK ΔV</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 8; text-anchor:start;" x="1485" y="750" >KPH</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:end;" x="1480" y="770" >BRN TIME</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 8; text-anchor:start;" x="1485" y="790" >MIN</text>
+  </svg>
+]]
+dynamicBrakesAndDeltaV = [[
+  <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 22; text-anchor:end;" x="1480" y="670" >63:30</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 22; text-anchor:end;" x="1480" y="710" >28230</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 22; text-anchor:end;" x="1480" y="750" >7089754</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 22; text-anchor:end;" x="1480" y="790" >6:28</text>
+  </svg>
+]]
+
+
+staticAvionics = [[
+  <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:end;" x="1680" y="650" >PVP EDGE</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 8; text-anchor:start;" x="1685" y="670" >SU</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:end;" x="1680" y="690" >PIPE DST</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 8; text-anchor:start;" x="1685" y="710" >SU</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:end;" x="1680" y="730" >ATMO DST</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 8; text-anchor:start;" x="1685" y="750" >SU</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:end;" x="1680" y="770" >B-ALT</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 8; text-anchor:start;" x="1685" y="790" >M</text>
+  </svg>
+]]
+dynamicAvionics = [[
+  <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 22; text-anchor:end;" x="1680" y="670" >63.1</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 22; text-anchor:end;" x="1680" y="710" >28</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 22; text-anchor:end;" x="1680" y="750" >61.2</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 22; text-anchor:end;" x="1680" y="790" >128582</text>
+  </svg>
+]]
+
+
+warningBrakes = [[
+  <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 24; text-anchor:middle;" x="1280" y="350" >BRAKES ENGAGED</text>
+  </svg>
+]]
+
+warningFuel = [[
+  <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 24; text-anchor:middle;" x="1280" y="370" >FUEL LOW - 20000 KPH ΔV</text>
+  </svg>
+]]
+
+staticWarp = [[
+  <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:start;" x="2000" y="350" >DESTINATION:</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:start;" x="2000" y="365" >DISTANCE:</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:start;" x="2000" y="380" >WARP CELLS:</text>
+  </svg>
+]]
+dynamicWarp = [[
+  <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:start;" x="2100" y="350" >CHAOS THEORY STATION</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:start;" x="2100" y="365" >310.69 M</text>
+    <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:start;" x="2100" y="380" >1160 / 110</text>
+  </svg>
+]]
+
+
+staticThrottle = [[
+  <svg style="position:absolute;" viewbox="-640 -775 2560 1440" preserveAspectRatio="none">
     <path d="m 765,49.06617 -10,2e-4 v 108.4998 h 2.5 -2.5 v 108.5 h 3"
     style='opacity:1;fill:none;stroke:#64a5b9;stroke-width:2;'
     />
     <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 12; text-anchor:start;" x="745.17616" y="43.56797" >MAX 51000 KPH</text>
     <path d="m 768.10496,245.19536 v 10.20758 l 10.20758,-5.10379 z"
-    style='opacity:0;fill:#64a5b9;fill-opacity:1;stroke:none;'
+    style='opacity:1;fill:#64a5b9;fill-opacity:1;stroke:none;'
     />
     <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 20; text-anchor:start;" x="782.88995" y="279.01715" >25.3G</text>
 
   </svg>
 ]]
-
 dynamicThrottle = [[
-  <svg style="position:absolute;" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+  <svg style="position:absolute;" viewbox="-640 -775 2560 1440" preserveAspectRatio="none">
     <path d="m 762,267.06617 v -91"
     style='opacity:1;fill:none;stroke:#64a5b9;stroke-width:6;'
     />
@@ -68,7 +375,7 @@ dynamicThrottle = [[
 --]]
 
 staticShield = [[
-  <svg style="position:absolute;" viewbox="0 400 2560 1440" preserveAspectRatio="none">
+  <svg style="position:absolute;" viewbox="-130 200 2560 1440" preserveAspectRatio="none">
     <path d="m 1006,1242 h -3 v -217 h 10"
     style='opacity:1;fill:none;stroke:#64a5b9;stroke-width:2;'
     />
@@ -77,7 +384,7 @@ staticShield = [[
   </svg>
 ]]
 dynamicShield = [[
-  <svg style="position:absolute;" viewbox="0 400 2560 1440" preserveAspectRatio="none">
+  <svg style="position:absolute;" viewbox="-130 200 2560 1440" preserveAspectRatio="none">
     <path d="m 1010.7098,1243.3259 v -217"
     style='opacity:1;fill:none;stroke:#64a5b9;stroke-width:6;'
     />
@@ -90,7 +397,7 @@ dynamicShield = [[
 
 
 staticCCS = [[
-  <svg style="position:absolute;" viewbox="50 400 2560 1440" preserveAspectRatio="none">
+  <svg style="position:absolute;" viewbox="-80 200 2560 1440" preserveAspectRatio="none">
     <path d="m 1006,1242 h -3 v -217 h 10"
     style='opacity:1;fill:none;stroke:#64a5b9;stroke-width:2;'
     />
@@ -98,7 +405,7 @@ staticCCS = [[
   </svg>
 ]]
 dynamicCCS = [[
-  <svg style="position:absolute;" viewbox="50 400 2560 1440" preserveAspectRatio="none">
+  <svg style="position:absolute;" viewbox="-80 200 2560 1440" preserveAspectRatio="none">
     <path d="m 1010.7098,1243.3259 v -217"
     style='opacity:1;fill:none;stroke:#64a5b9;stroke-width:6;'
     />
@@ -109,7 +416,7 @@ dynamicCCS = [[
 
 
 staticFuel = [[
-  <svg style="position:absolute;" viewbox="-250 400 2560 1440" preserveAspectRatio="none">
+  <svg style="position:absolute;" viewbox="-350 200 2560 1440" preserveAspectRatio="none">
     <path d="m 1006,1242 h -3 v -217 h 10"
     style='opacity:1;fill:none;stroke:#64a5b9;stroke-width:2;'
     />
@@ -117,7 +424,7 @@ staticFuel = [[
   </svg>
 ]]
 dynamicFuel = [[
-  <svg style="position:absolute;" viewbox="-250 400 2560 1440" preserveAspectRatio="none">
+  <svg style="position:absolute;" viewbox="-350 200 2560 1440" preserveAspectRatio="none">
     <path d="m 1010.7098,1243.3259 v -217"
     style='opacity:1;fill:none;stroke:#64a5b9;stroke-width:6;'
     />
@@ -130,7 +437,7 @@ dynamicFuel = [[
 
 -- transform is -993.22343,-869.18211 so viewbox in the positive offsets to correct position
 staticShieldResist = [[
-  <svg style="position:absolute;" viewbox="993.223 869.182 2560 1440" preserveAspectRatio="none">
+  <svg style="position:absolute;" viewbox="93.223 339.182 2560 1440" preserveAspectRatio="none">
     <path d="m ]] .. 1300.1373 .. [[,]] .. 1302.42 .. [[ v -1.3523 l 6.1822,-4.057 v -1.932 h -4.1536 l -2.1251,-2.5115 v -3.8639 l 2.1251,-2.7047 h 7.9209 l 5.7958,1.3524 h 20.5751 v 2.3183 h -17.7738 l -0.7728,0.7728 v 0.966 l 0.7728,0.7727 h 17.7738 v 2.3184 h -11.3018 v 0.9659 h -4.2503 l -2.8979,0.7728 v 2.8013 l 3.1877,2.0285 v 1.3523 z"
     style='fill:#64a5b9;fill-opacity:0.2;stroke:#64a5b9;stroke-width:0.5;stroke-opacity:1'
     />
@@ -158,7 +465,7 @@ staticShieldResist = [[
 </svg>
 ]]
 dynamicShieldResist = [[
-<svg style="position:absolute;" viewbox="993.223 869.182 2560 1440" preserveAspectRatio="none">
+<svg style="position:absolute;" viewbox="93.223 339.182 2560 1440" preserveAspectRatio="none">
 
 <path d="m 1309.9444,1318.7169 33.8322,-11.1347 14.3465,11.5629 -14.1324,11.1346 z"
     style='fill:#ff0e00;fill-opacity:0.488559;stroke-opacity:0'
@@ -176,26 +483,42 @@ dynamicShieldResist = [[
 ]]
 
 staticShieldHistory = [[
- <svg style="position:absolute;" viewbox="993.223 869.182 2560 1440" preserveAspectRatio="none">
+ <svg style="position:absolute;" viewbox="230 80 2560 1440" preserveAspectRatio="none">
     <path d="m 1529.0343,990.37962 h -100 v -50 h 2"
     style='opacity:1;fill:none;stroke:#64a5b9;stroke-width:2;'
     />
+   <text style="fill: ]]..colour..[[; font-family: Arial; font-size: 8; text-anchor:middle;" x="1479.0343" y="987.37962" >SHIELD HISTORY</text>
   </svg>
 ]]
 dynamicShieldHistory = [[
- <svg style="position:absolute;" viewbox="993.223 869.182 2560 1440" preserveAspectRatio="none">
+ <svg style="position:absolute;" viewbox="230 80 2560 1440" preserveAspectRatio="none">
     <path d="m 1528.743,969.93136 -13.8923,-1.46761 -9.0345,-12.33143 -6.4533,-9.54325 -8.4758,2.67381 -8.3172,10.53767 -9.8677,-0.23861 -6.7605,-8.45595 -9.0634,-3.23858 -9.3995,0.33149 -10.6528,-10e-6 -7.878,-3.91154"
     style='opacity:1;fill:none;stroke:#64a5b9;stroke-width:1;'
     />
   </svg>
 ]]
 
+------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------- end ---------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------
+
 periscope = ''
 system.showScreen(true)
 system.setScreen(table.concat({periscope, periscopeStaticBorder, staticCCS, dynamicCCS, staticShieldResist, dynamicShieldResist,
-  staticShieldHistory, dynamicShieldHistory, dynamicShield, staticShield, staticFuel, dynamicFuel,dynamicThrottle, staticThrottle}))
+  staticShieldHistory, dynamicShieldHistory, dynamicShield, staticShield, staticFuel, dynamicFuel,dynamicThrottle, staticThrottle,
+  staticWarp, dynamicWarp, warningFriendly, warningBrakes, warningFuel, staticBrakesAndDeltaV, dynamicBrakesAndDeltaV,
+  staticAvionics, dynamicAvionics, dynamicTvi, dynamicAtvi, dynamicBoresight,
+  dynamicRangingTableVertical, staticRangingTableVertical, staticTarget, dynamicTarget, staticWeapon, dynamicWeapon,
+  staticDpsMeter, dynamicDpsMeter}))
+
+--staticRangingTableHorizontal, dynamicRangingTableHorizontal
 
 
 spam=table.concat({periscope, periscopeStaticBorder, staticCCS, dynamicCCS, staticShieldResist, dynamicShieldResist,
-  staticShieldHistory, dynamicShieldHistory, dynamicShield, staticShield, staticFuel, dynamicFuel,dynamicThrottle, staticThrottle})
-spam = spam..spam
+  staticShieldHistory, dynamicShieldHistory, dynamicShield, staticShield, staticFuel, dynamicFuel,dynamicThrottle, staticThrottle,
+  staticWarp, dynamicWarp, warningFriendly, warningBrakes, warningFuel, staticBrakesAndDeltaV, dynamicBrakesAndDeltaV,
+  staticAvionics, dynamicAvionics, dynamicTvi, dynamicAtvi, dynamicBoresight,
+  dynamicRangingTableVertical, staticRangingTableVertical})
+
+
+spam = spam --..spam
