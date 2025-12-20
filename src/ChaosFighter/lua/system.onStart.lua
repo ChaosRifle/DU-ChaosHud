@@ -9,10 +9,25 @@ colourWeaponRange = '#00ab00' --export
 colourBogey = '#ffff00' --export
 colourBandit = '#ff0000' --export
 colourFriendly = '#00ff00' --export
+colourAmmo = '#ff0000' --export
 
-
+local sHeight = system.getScreenHeight()
+local sWidth = system.getScreenWidth()
+local sWidthMod = sHeight / 9 * 16
+local sWidthOffset = (sWidth - sWidthMod) / 2
+local targetLockText = { 'TARGET LOCKED', 'NO TARGET' }
 local weaponRange = 1401
 local identRange = 1241
+local weapons = {
+    {'M', 0.45},
+    {'M', 0.2},
+    {'R', 1},
+    {'C', 0.9},
+    {'S', 0},
+    {'L', 0.01}
+}
+local weaponCount = #weapons
+
 
 function svgTxt(x,y,font,size,colour,anchor,text,rotate)
   if rotate then rotate ='" transform="rotate(-90)'else rotate =''end
@@ -28,19 +43,22 @@ function svgPthFill(colour,path,opacity)
   if opacity == nil then opacity = 1 end
   return ccat({'<path d="m ',path,'" style="fill:',colour,';fill-opacity:',opacity,';stroke-opacity:0"/>'})
 end
-
-function svg(content, vb3, vb4, vb1, vb2)
+local DropShadow = false
+function svg(content, left, top) --, vb3, vb4, vb1, vb2)
   --viewbox = {230,80,2560,1440}
   --contents = svgTxt()
-  if vb1 == nil then vb1 = 0 end
-  if vb2 == nil then vb2 = 0 end
-  local data = {'<svg style="position:absolute;" viewbox="', ccat({vb1,vb2,vb3,vb4},' '), '" preserveAspectRatio="none">', '</svg>' }
+  --if vb1 == nil then vb1 = 0 end
+    --if vb2 == nil then vb2 = 0 end
+    if left == nil then left=0 end
+    if top == nil then top=0 end
+    local shadow = ''
+    if DropShadow == true then shadow = 'filter: drop-shadow(1px 1px 1px black);' end
+  local data = {'<svg height='..sHeight ..' width='.. sWidthMod ..' style="'..shadow..'position:absolute;left:'..sWidthOffset + left..';top:'..top..'" viewbox="0 0 2560 1440" preserveAspectRatio="none">', '</svg>' }
   for i=1, #content, 1 do
-    table.insert(data, 3+i, content[i])
+    table.insert(data, 1+i, content[i])
   end
   return ccat(data)
 end
-
 
 
 periscope = [[
@@ -65,82 +83,120 @@ periscope = [[
 
 periscopeStaticBorder =
 [[
-    <svg style="filter: drop-shadow(1px 1px 1px black);position:absolute;left:2vw;top:22.15vh;width:19.5vw;height:25vh;" viewbox="0 0 200 200" preserveAspectRatio="none">
+    <svg style="filter: drop-shadow(2px 2px 2px black);position:absolute;left:2vw;top:22.15vh;width:19.5vw;height:25vh;" viewbox="0 0 200 200" preserveAspectRatio="none">
         <polyline style="opacity:1;fill:none;stroke:]] .. colour .. [[;stroke-width:2;stroke-miterlimit:0;" points="5,0 0,0 0,200 5,200" />
         <polyline style="opacity:1;fill:none;stroke:]] .. colour .. [[;stroke-width:2;stroke-miterlimit:0;" points="195,0 200,0 200,200 195,200" />
     </svg>
 ]]
 
+resolutionTest = [[<svg height="]]..sHeight ..[[" width="]]..sWidthMod..[[" style="position:absolute;left:]]..sWidthOffset..[[;top:0" viewbox="0 0 2560 1440" preserveAspectRatio="none">
+    <path d="m 0,0 h 2560 v 1440 h -2560 z"
+    style='opacity:1;fill:]]..colourBandit..[[;fill-opacity:]]..0 ..[[;stroke:]]..colour..[[;stroke-width:6;stroke-opacity:0'
+    />
+]] .. svgTxt(20,20,'Sans-Serif',40,colourBandit,1,'TEST! this is a test and must be seen')
+  ..[[
+  </svg>]]
+
+
+scalingTest = [[<svg
+  version="1.1"
+
+  baseProfile="full"
+  width="2560"
+  height="1440"
+  viewbox="0 0 2560 1440"
+  style="position:absolute;left:-200;top:20.5"
+  >
+  <rect width="100%" height="100%" fill="black" />
+  <circle cx="250" cy="275" r="90" fill="blue" transform="translate(50 0)" />
+  <circle cx="250" cy="275" r="90" fill="red" />
+  <circle cx="250" cy="275" r="90" fill="red" />
+  <circle cx="250" cy="275" r="90" fill="red" />
+  <circle cx="250" cy="275" r="90" fill="red" />
+
+  <path d="m 1019,779 h 334" style="stroke:#00ff00;fill-opacity:0;stroke-opacity:1;stroke-width:1"/>
+  <path d="m 1019,179 v1 h 334 v -1 z" style="fill:#00ff00;fill-opacity:1;stroke-opacity:0"/>
+</svg>]]
+
+
+
 ------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------- gunnery seat ----------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------
+local HitProbP = 0.65
+local WeaponOptimalAngVel = .24
 staticTarget = svg({
-        svgPth(colour,'1019.5,112 h 334',1),
-        svgPth(colour,'1019.5,123 h 334',1),
-
-        svgTxt(1300,100,'Arial',8,colour,1,'ANGULAR VELOCITY'),
-        svgTxt(1300,100,'Arial',12,colour,1,'HIT PROBABILITY'),
-        svgTxt(1400,150,'Arial',12,colour,1,'RANGE'),
-        svgTxt(1300,150,'Arial',12,colour,1,'MAX SPEED'),
-    }, 2560, 1440)
-dynamicTarget = svg({
-        svgPthFill(colour,'1019.5,179 v8 h ' .. 334 * .45 ..' v -8 z'),
-
-        svgTxt(1300,100,'Arial',8,colour,1,'TARGET LOCKED / NO TARGET'),
-        svgTxt(1300,100,'Arial',8,colour,1,'UID'),
-        svgTxt(1300,100,'Arial',8,colour,2,'XS'),
-        svgTxt(1300,100,'Arial',8,colour,1,'TARGET SHIP NAME GOES HERE'),
-
-        svgTxt(1300,100,'Arial',8,colour,1,'0.05° per sec'),
-        svgTxt(1300,100,'Arial',8,colour,1,'119 M'),
-        svgTxt(1300,100,'Arial',8,colour,1,'51468 KPH'),
-        svgTxt(1300,100,'Arial',8,colour,1,'100%'),
-
-
-        svgPthFill('#188347','1018.6625,149.95971 25.7273,-0.0806 97.3198,17.13078 -122.8727,-0.0118 z',.5),
-        svgPth('#34d484','1044.4524,149.05643 v 17.97641',1),
-        svgPth(colour,'1142.3069,149.04321 v 18.51302 H 1018.216 v -18.24472',1),
-        svgPthFill(colour,1015+124*.75 ..',167.5 5,-13.5 5,13.5 z'),
-    }, 2560, 1440)
-
-local weaponArray = {'','','','','',''}
-staticWeapon = svg({
-        svgTxt(1465,142,'Arial',8,colour,2,'WEAPON STATUS'),
-        svgPth(colour,'1415,145 h 100',1),
-
-        svgPth(colour,'1415,152.5 h '..100 * 0.75,8),
-        svgPth(colour,'1415,160 h 100',1),
+        svgPth(colour,'1113,312.5 h 334',1), --hit prob border
+        svgPth(colour,'1113,323.5 h 334',1), --hit prob border
+        svgTxt(1113,310,'Arial',14,colour,1,'HIT PROBABILITY'),
+        svgPthFill('#188347','1113.5,252.5 0,17 124,0 '.. -124*(1-WeaponOptimalAngVel)..',-17 z',.5), --angVel bg
+        svgPth('#34d484',1113+124*WeaponOptimalAngVel .. ',251.5 v 18',1), --angVel optimal line FIXME this needs to be rounded to the nearest x.5
+        svgPth(colour,'1113.5,250.5 v 19 h 124 v -19',1), --angVel border
+        svgTxt(1113,245,'Arial',14,colour,1,'ANGULAR VELOCITY'),
+        svgTxt(1270,245,'Arial',14,colour,1,'RANGE'),
+        svgTxt(1380,245,'Arial',14,colour,1,'MAX SPEED'),
+    })
+local angVelP = 0 --needs clamping as "100%" is just the limit of the gun, not the ship capability
+local AngVelN = 0.07 --deg/s
+local targetData = {['u'] = 'WMD', ['s'] = 'XS', ['n'] = 'TARGET SHIP NAME GOES HERE' }
+local targetLocked = 1 --bool 1 or 2
+    dynamicTarget = svg({
+            svgPthFill(colour,'1113,314 v 8 h ' .. 334 * HitProbP ..' v -8 z'), --hit prob
+            svgTxt(1447,322,'Arial',14,colour,1,HitProbP*100 ..'%'),
+            svgPthFill(colour,1114-5+124*angVelP ..',270 5,-13.5 5,13.5 z'), --angVel needle
+            svgTxt(1113,283,'Arial',16,colour,1,AngVelN .. '° per sec'),
+            svgTxt(1270,265,'Arial',20,colour,1,'119 M'),
+            svgTxt(1380,265,'Arial',20,colour,1,'51468 KPH'),
+            svgTxt(1113,220,'Arial',20,colourBandit,1,targetData.u),
+            svgTxt(1185,220,'Arial',20,colour,2,targetData.s),
+            svgTxt(1203,220,'Arial',20,colour,1,targetData.n),
+            svgTxt(1113,200,'Arial',14,colour,1,targetLockText[targetLocked]),
+        })
 
 
+staticWeapon = {
+        svgTxt(1585,142,'Arial',8,colour,2,'WEAPON STATUS'),
+        svgPth(colour,'1535,145.5 h 100',1),
+    }
+for i=1, weaponCount do
+    table.insert(staticWeapon, svgTxt(1525,142 + 15 * i,'Arial',12,colour,2,weapons[i][1]))
+    table.insert(staticWeapon, svgPth(colour,'1535,' .. 145.5 +15*i.. ' h 100',1))
+end
+dynamicWeapon = {}
+for i=1, weaponCount do
+    table.insert(dynamicWeapon, svgPthFill(colourAmmo,'1535,' .. 142 + 15 * i .. ' v-8 h ' .. 100 * weapons[i][2] ..' v 8 z'))
+end
+staticWeapon = svg(staticWeapon)
+dynamicWeapon = svg(dynamicWeapon)
 
-
-        svgTxt(1800,150,'Arial',8,colour,1,'SHOTS FIRED'),
-        svgTxt(1800,160,'Arial',8,colour,1,'SHOTS HIT'),
-        svgTxt(1800,170,'Arial',8,colour,1,'ACCURACCY'),
-        svgTxt(1800,180,'Arial',8,colour,1,'PEAK DPS'),
-        svgTxt(1800,190,'Arial',8,colour,1,'DAMAGE TOTAL')
-    }, 2560, 1440)
-dynamicWeapon = svg({
-        svgTxt(1900,150,'Arial',8,colour,1,'1380'),
-        svgTxt(1900,160,'Arial',8,colour,1,'1275'),
-        svgTxt(1900,170,'Arial',8,colour,1,'95%'),
-        svgTxt(1900,180,'Arial',8,colour,1,'102 K'),
-        svgTxt(1900,190,'Arial',8,colour,1,'440295 K')
-    }, 2560, 1440)
+staticWeaponStats = svg({
+        svgTxt(1800,150,'Arial',12,colour,1,'SHOTS FIRED'),
+        svgTxt(1800,165,'Arial',12,colour,1,'SHOTS HIT'),
+        svgTxt(1800,180,'Arial',12,colour,1,'ACCURACCY'),
+        svgTxt(1800,195,'Arial',12,colour,1,'PEAK DPS'),
+        svgTxt(1800,210,'Arial',12,colour,1,'DAMAGE TOTAL'),
+})
+dynamicWeaponStats = svg({
+        svgTxt(1910,150,'Arial',12,colour,1,'1380'),
+        svgTxt(1910,165,'Arial',12,colour,1,'1275'),
+        svgTxt(1910,180,'Arial',12,colour,1,'95%'),
+        svgTxt(1910,195,'Arial',12,colour,1,'102 K'),
+        svgTxt(1910,210,'Arial',12,colour,1,'440295 K')
+})
 
 staticDpsMeter = svg({
-        svgPth(colour,'1499.5,299.5 h -100 v -50 l 2,-0.0206',1),
-    }, 2560, 1440)
+        svgPth(colour,'1599.5,299.5 h -100 v -50 l 2,0',1),
+    })
 dynamicDpsMeter = svg({
-  svgPth(colour,'1400.7484,298.79558 7.577,-11.85958 10.2124,-7.24752 7.9064,8.23582 10.5418,-12.84788 8.2359,-7.24753 8.2358,-10.54185 9.5535,-0.98829 9.2242,-0.32944 9.883,0.32944 11.2007,-10e-6 8.8946,-2.63545',1),
-  svgTxt(1502,299,'Arial',8,colour,1,'102 K DPS'),
-}, 2560, 1440)
+  svgPth(colour,'1500.7484,298.79558 7.577,-11.85958 10.2124,-7.24752 7.9064,8.23582 10.5418,-12.84788 8.2359,-7.24753 8.2358,-10.54185 9.5535,-0.98829 9.2242,-0.32944 9.883,0.32944 11.2007,-10e-6 8.8946,-2.63545',1),
+  svgTxt(1602,299,'Arial',8,colour,1,'102 K DPS'),
+})
 
 ------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------- gunner and pilot seat -----------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------
 staticRangingTableVertical = [[
-  <svg style="position:absolute;" viewbox="250 675 2560 1440" preserveAspectRatio="none">
+  <svg style="position:absolute;" viewbox="255 676 2560 1440" preserveAspectRatio="none">
     <path d="m 1040, ]] ..identRange..[[ h -14"
     style='opacity:1;fill:none;stroke:]]..colourIdentifyRange..[[;stroke-width:2;'
     />
@@ -160,14 +216,14 @@ staticRangingTableVertical = [[
 
   <text style="fill: ]]..colour..[[; font-family: sans-serif; font-size: 12; text-anchor:start;" x="1046" y="805" >5.0 SU</text>
 
-    <path d="m 1040,800 h -15 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 9.5 -9.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 15 -15 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 9.5 -9.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 15"
+    <path d="m 1040.5,800.5 h -15 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 9.5 -9.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 15 -15 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 9.5 -9.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 4.5 -4.5 v 37.5 h 15"
     style='opacity:1;fill:none;stroke:]]..colour..[[;stroke-width:1;'
     />
   </svg>
 ]]
 dynamicRangingTableVertical = [[
-  <svg style="position:absolute;" viewbox="250 675 2560 1440" preserveAspectRatio="none">
-    <rect width="16" height="16" x="837.83148" y="1273.0002"
+  <svg style="position:absolute;" viewbox="255 676 2560 1440" preserveAspectRatio="none">
+    <rect width="16" height="16" x="837.5" y="1273.5"
     style='opacity:1;fill:none;stroke:]]..colourBogey..[[;stroke-width:1;'
     />
     <circle cx="930" cy="1280" r="8"
@@ -212,8 +268,27 @@ dynamicRangingTableHorizontal = [[
 ]]
 
 warningFriendly = svg({
-        svgTxt(1280,330,'Arial',24,colour,2,'FRIENDLY TARGET'),
-    }, 2560, 1440)
+        svgTxt(1280,350,'Arial',24,colour,2,'FRIENDLY TARGET'), --FIXME alternate colour every second
+    })
+
+staticContacts = svg({
+        svgTxt(2000,800,'Arial',28,colour,1,'CONTACTS'),
+    })
+dynamicContacts = svg({
+        svgTxt(2000,800,'Arial',28,colour,1,'1258'), --contact count
+        svgTxt(2100,850,'Arial',28,colourFriendly,3,'FRIENDS 3  '),
+        svgTxt(2100,850,'Arial',28,colourFriendly,3,'/'),
+        svgTxt(2100,850,'Arial',28,colourBandit,1,'  25 BOGEYS'),
+
+
+        svgTxt(2000,800,'Arial',28,colour,1,'UID'),
+        svgTxt(2000,800,'Arial',28,colour,1,'XL'),
+        svgTxt(2000,800,'Arial',28,colour,1,'SHIP NAME HERE IS LONG OH NO'),
+        svgTxt(2000,800,'Arial',28,colour,1,'108 SU'),
+        svgTxt(2000,800,'Arial',28,colour,1,'10498 KPH'),
+
+    })
+
 ------------------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------ pilot seat ------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------
@@ -504,21 +579,24 @@ dynamicShieldHistory = [[
 
 periscope = ''
 system.showScreen(true)
-system.setScreen(table.concat({periscope, periscopeStaticBorder, staticCCS, dynamicCCS, staticShieldResist, dynamicShieldResist,
+system.setScreen(table.concat({'<html> <body> ', periscope, periscopeStaticBorder, staticCCS, dynamicCCS, staticShieldResist, dynamicShieldResist,
   staticShieldHistory, dynamicShieldHistory, dynamicShield, staticShield, staticFuel, dynamicFuel,dynamicThrottle, staticThrottle,
   staticWarp, dynamicWarp, warningFriendly, warningBrakes, warningFuel, staticBrakesAndDeltaV, dynamicBrakesAndDeltaV,
   staticAvionics, dynamicAvionics, dynamicTvi, dynamicAtvi, dynamicBoresight,
   dynamicRangingTableVertical, staticRangingTableVertical, staticTarget, dynamicTarget, staticWeapon, dynamicWeapon,
-  staticDpsMeter, dynamicDpsMeter}))
+  staticDpsMeter, dynamicDpsMeter, staticContacts, dynamicContacts, staticWeaponStats, dynamicWeaponStats, ' </body> </html>'}))
 
 --staticRangingTableHorizontal, dynamicRangingTableHorizontal
+--system.setScreen(scalingTest)
 
-
-spam=table.concat({periscope, periscopeStaticBorder, staticCCS, dynamicCCS, staticShieldResist, dynamicShieldResist,
+spam=table.concat({'<html> <body> ', periscope, periscopeStaticBorder, staticCCS, dynamicCCS, staticShieldResist, dynamicShieldResist,
   staticShieldHistory, dynamicShieldHistory, dynamicShield, staticShield, staticFuel, dynamicFuel,dynamicThrottle, staticThrottle,
   staticWarp, dynamicWarp, warningFriendly, warningBrakes, warningFuel, staticBrakesAndDeltaV, dynamicBrakesAndDeltaV,
   staticAvionics, dynamicAvionics, dynamicTvi, dynamicAtvi, dynamicBoresight,
-  dynamicRangingTableVertical, staticRangingTableVertical})
+  dynamicRangingTableVertical, staticRangingTableVertical, staticTarget, dynamicTarget, staticWeapon, dynamicWeapon,
+  staticDpsMeter, dynamicDpsMeter, staticContacts, dynamicContacts, resolutionTest, ' </body> </html>'})
 
 
 spam = spam --..spam
+
+--system.print(svg({svgTxt(0,100,'Arial',40,colour,1,'CHAOS-HUD'),}, 300, 300))
